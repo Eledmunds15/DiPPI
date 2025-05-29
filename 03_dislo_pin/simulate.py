@@ -11,7 +11,7 @@ from utilities import set_path, clear_dir
 INPUT_DIR = '../02_minimization/min_input'
 INPUT_FILE = 'edge_dislo.lmp'
 
-DUMP_DIR = 'min_dump'
+DUMP_DIR = 'dump_files'
 
 POTENTIAL_DIR = '../00_potentials'
 POTENTIAL_FILE = 'malerba.fs'
