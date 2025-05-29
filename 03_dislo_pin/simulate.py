@@ -12,6 +12,7 @@ INPUT_DIR = '../02_minimization/min_input'
 INPUT_FILE = 'edge_dislo.lmp'
 
 DUMP_DIR = 'dump_files'
+RESTART_DIR = 'restart_files'
 
 POTENTIAL_DIR = '../00_potentials'
 POTENTIAL_FILE = 'malerba.fs'
@@ -26,6 +27,7 @@ SHEAR_VELOCITY = 1
 
 RUN_TIME = 100
 DUMP_FREQ = 1000
+RESTART_FREQ = 1000
 
 # --------------------------- MINIMIZATION ---------------------------#
 
@@ -47,8 +49,10 @@ def main():
     input_filepath = os.path.join(INPUT_DIR, INPUT_FILE)
 
     dump_file = 'dumpfile_*'
+    restart_file = 'restart_*'
 
     dump_filepath = os.path.join(DUMP_DIR, dump_file)
+    restart_filepath = os.path.join(RESTART_DIR, restart_file)
 
     potential_path = os.path.join(POTENTIAL_DIR, POTENTIAL_FILE)
 
@@ -134,7 +138,10 @@ def main():
     #--- Dump Files ---#
     L.dump('1', 'all', 'custom', DUMP_FREQ, dump_filepath, 'id', 'x', 'y', 'z', 'c_peratom', 'c_stress[4]')
 
-    L.run(RUN_TIME)
+    #--- Restart Files ---#
+    L.restart(RESTART_FREQ, )
+
+    L.run(RUN_TIME, restart_filepath)
 
     L.close()
 
