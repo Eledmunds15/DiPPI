@@ -1,2 +1,5 @@
 # Data Files
 *.lmp
+*.xsf
+
+__pycache__*
