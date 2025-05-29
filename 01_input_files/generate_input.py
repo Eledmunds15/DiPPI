@@ -12,7 +12,7 @@ from utilities import set_path, clear_dir_exclude_file
 POTENTIAL_DIR = '../00_potentials'
 POTENTIAL_FILE = 'malerba.fs'
 
-OUTPUT_FILE = 'edge_dislocation.lmp'
+OUTPUT_FILE = 'edge_dislo.lmp'
 
 MATERIAL = 'Fe'
 CRYSTAL_STRUCTURE = 'bcc'
@@ -22,9 +22,9 @@ X_ORIENTATION = '[111]'
 Y_ORITENTATION = '[-101]'
 Z_ORITENTATION = '[1-21]'
 
-X_SIZE = 120
-Y_SIZE = 60
-Z_SIZE = 60
+X_SIZE = 20
+Y_SIZE = 20
+Z_SIZE = 20
 
 # --------------------------- INPUT GENERATOR ---------------------------#
 def main():
