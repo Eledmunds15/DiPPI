@@ -3,3 +3,5 @@
 *.xsf
 
 __pycache__*
+
+*_files/
