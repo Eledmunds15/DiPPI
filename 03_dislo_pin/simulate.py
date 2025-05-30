@@ -26,8 +26,9 @@ TEMPERATURE = 100
 SHEAR_VELOCITY = 1
 
 RUN_TIME = 100
+THERMO_FREQ = 1000
 DUMP_FREQ = 1000
-RESTART_FREQ = 1000
+RESTART_FREQ = 10000
 
 # --------------------------- MINIMIZATION ---------------------------#
 
@@ -42,14 +43,16 @@ def main():
 
     if rank == 0:
           os.makedirs(DUMP_DIR, exist_ok=True)
+          os.makedirs(RESTART_DIR, exist_ok=True)
           clear_dir(DUMP_DIR)
+          clear_dir(RESTART_DIR)
 
     #--- CREATE AND SET DIRECTORIES ---#
 
     input_filepath = os.path.join(INPUT_DIR, INPUT_FILE)
 
     dump_file = 'dumpfile_*'
-    restart_file = 'restart_*'
+    restart_file = 'restart.*'
 
     dump_filepath = os.path.join(DUMP_DIR, dump_file)
     restart_filepath = os.path.join(RESTART_DIR, restart_file)
@@ -122,8 +125,8 @@ def main():
     # Define fixes and forces for the top and bottom surfaces
     L.fix('top_surface_freeze', 'top_surface', 'setforce', 0.0, 0.0, 0.0)
     L.fix('bottom_surface_freeze', 'bottom_surface', 'setforce', 0.0, 0.0, 0.0)
-    L.velocity('top_surface', 'set', -SHEAR_VELOCITY, 0.0, 0.0)
-    L.velocity('bottom_surface', 'set', SHEAR_VELOCITY, 0.0, 0.0)
+    L.velocity('top_surface', 'set', -(SHEAR_VELOCITY/2), 0.0, 0.0)
+    L.velocity('bottom_surface', 'set', (SHEAR_VELOCITY/2), 0.0, 0.0)
 
     L.fix('precipitate_freeze', 'precipitate', 'setforce', 0.0, 0.0, 0.0)
     L.velocity('precipitate', 'set', 0.0, 0.0, 0.0)
@@ -133,15 +136,15 @@ def main():
 
     #--- Thermo ---#
     L.thermo_style('custom', 'step', 'temp', 'pe', 'etotal', 'c_press_comp[1]', 'c_press_comp[2]', 'c_press_comp[3]', 'c_press_comp[4]', 'c_press_comp[5]', 'c_press_comp[6]')
-    L.thermo(1000)
+    L.thermo(THERMO_FREQ)
 
     #--- Dump Files ---#
     L.dump('1', 'all', 'custom', DUMP_FREQ, dump_filepath, 'id', 'x', 'y', 'z', 'c_peratom', 'c_stress[4]')
 
     #--- Restart Files ---#
-    L.restart(RESTART_FREQ, )
+    L.restart(RESTART_FREQ, restart_filepath)
 
-    L.run(RUN_TIME, restart_filepath)
+    L.run(RUN_TIME)
 
     L.close()
 

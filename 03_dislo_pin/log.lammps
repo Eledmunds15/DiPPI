@@ -7,30 +7,30 @@ atom_style atomic
 boundary p f p
 read_data ../02_minimization/min_input/edge_dislo.lmp
 Reading data file ...
-  orthogonal box = (0 0 0) to (53.225831 80.759506 139.87957)
+  orthogonal box = (0 0 0) to (250.99596 282.65827 419.6387)
   1 by 2 by 2 MPI processor grid
   reading atoms ...
-  49200 atoms
+  2532600 atoms
   reading velocities ...
-  49200 velocities
-  read_data CPU = 0.297 seconds
+  2532600 velocities
+  read_data CPU = 15.073 seconds
 pair_style eam/fs
 pair_coeff * * ../00_potentials/malerba.fs Fe
 group all type 1
-49200 atoms in group all
+2532600 atoms in group all
 displace_atoms all move 40 0 0 units box
 Displacing atoms ...
-region precipitate_reg sphere 26.612915585 40.379753 69.9397838 30
-region top_surface_reg block INF INF 70.759506 INF INF INF
+region precipitate_reg sphere 125.49797894 141.3291355 209.8193514 30
+region top_surface_reg block INF INF 272.658271 INF INF INF
 region bottom_surface_reg block INF INF INF 10.0 INF INF
 group top_surface region top_surface_reg
-4800 atoms in group top_surface
+72000 atoms in group top_surface
 group bottom_surface region bottom_surface_reg
-6300 atoms in group bottom_surface
+90900 atoms in group bottom_surface
 group precipitate region precipitate_reg
-9000 atoms in group precipitate
+9723 atoms in group precipitate
 group mobile_atoms subtract all precipitate top_surface bottom_surface
-29100 atoms in group mobile_atoms
+2359977 atoms in group mobile_atoms
 compute peratom all pe/atom
 compute stress all stress/atom NULL
 compute temp_compute all temp
@@ -53,69 +53,6 @@ write_dump precipitate custom precipitate_ID id
 WARNING: Calling write_dump before a full system init. (src/write_dump.cpp:88)
 thermo_style custom step temp pe etotal c_press_comp[1] c_press_comp[2] c_press_comp[3] c_press_comp[4] c_press_comp[5] c_press_comp[6]
 thermo 1000
-dump 1 all custom 1000 min_dump/dumpfile_* id x y z c_peratom c_stress[4]
+dump 1 all custom 1 dump_files/dumpfile_* id x y z c_peratom c_stress[4]
+restart 1 restart_files/restart.*
 fix __pylammps_internal_run_callback all python/invoke 1 end_of_step _PyLammps_end_of_step_callback
-run 100
-
-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
-
-Your simulation uses code contributions which should be cited:
-
-- Type Label Framework: https://doi.org/10.1021/acs.jpcb.3c08419
-
-@Article{Gissinger24,
- author = {Jacob R. Gissinger, Ilia Nikiforov, Yaser Afshar, Brendon Waters, Moon-ki Choi, Daniel S. Karls, Alexander Stukowski, Wonpil Im, Hendrik Heinz, Axel Kohlmeyer, and Ellad B. Tadmor},
- title = {Type Label Framework for Bonded Force Fields in LAMMPS},
- journal = {J. Phys. Chem. B},
- year =    2024,
- volume =  128,
- number =  13,
- pages =   {3282–-3297}
-}
-
-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
-
-Neighbor list info ...
-  update: every = 1 steps, delay = 0 steps, check = yes
-  max neighbors/atom: 2000, page size: 100000
-  master list distance cutoff = 7.8
-  ghost atom cutoff = 7.8
-  binsize = 3.9, bins = 14 21 36
-  1 neighbor lists, perpetual/occasional/extra = 1 0 0
-  (1) pair eam/fs, perpetual
-      attributes: half, newton on
-      pair build: half/bin/atomonly/newton
-      stencil: half/bin/3d
-      bin: standard
-Per MPI rank memory allocation (min/avg/max) = 11.59 | 11.78 | 11.98 Mbytes
-   Step          Temp          PotEng         TotEng     c_press_comp[1] c_press_comp[2] c_press_comp[3] c_press_comp[4] c_press_comp[5] c_press_comp[6]
-         0   64.196264     -198260.3      -197852.05     -3470.4528     -335.87099     -3965.2596      111.57226      440.19917      100.68716    
-       100   73.084134     -198271.45     -197806.67     -14010.452     -4703.6188     -8266.0744      1700.966       254.42547     -695.22064    
-Loop time of 3.50379 on 4 procs for 100 steps with 49200 atoms
-
-Performance: 2.466 ns/day, 9.733 hours/ns, 28.541 timesteps/s, 1.404 Matom-step/s
-99.6% CPU use with 4 MPI tasks x 1 OpenMP threads
-
-MPI task timing breakdown:
-Section |  min time  |  avg time  |  max time  |%varavg| %total
----------------------------------------------------------------
-Pair    | 3.0705     | 3.2478     | 3.4275     |   9.3 | 92.69
-Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.026583   | 0.20721    | 0.38552    |  37.1 |  5.91
-Output  | 0.00026002 | 0.00027374 | 0.00030829 |   0.0 |  0.01
-Modify  | 0.036477   | 0.038188   | 0.039835   |   0.8 |  1.09
-Other   |            | 0.0103     |            |       |  0.29
-
-Nlocal:          12300 ave       12920 max       11680 min
-Histogram: 2 0 0 0 0 0 0 0 0 2
-Nghost:          10708 ave       10886 max       10530 min
-Histogram: 2 0 0 0 0 0 0 0 0 2
-Neighs:         963275 ave 1.04343e+06 max      883627 min
-Histogram: 2 0 0 0 0 0 0 0 0 2
-
-Total # of neighbors = 3853100
-Ave neighs/atom = 78.315041
-Neighbor list builds = 0
-Dangerous builds = 0
-unfix __pylammps_internal_run_callback
-Total wall time: 0:00:04
