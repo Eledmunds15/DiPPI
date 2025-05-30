@@ -9,16 +9,13 @@
 #SBATCH --error=999_HPC_outputs/error-%j.log
 
 # Create or clear HPC_outputs directory
-if [ -d HPC_outputs ]; then
-    rm -rf 999_HPC_outputs/*
-else
-    mkdir 999_HPC_outputs
-fi
+rm -rf 999_HPC_outputs/*
+
 
 # Load python modules
 export SLURM_EXPORT_ENV=ALL
 module load Anaconda3
-conda activate mol_dynamics_lmp
+source activate mol_dynamics_lmp
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
