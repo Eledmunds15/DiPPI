@@ -14,9 +14,12 @@ venv/
 # Ignore VSCode settings folder
 .vscode/
 
-# Ignore LAMMPS data files
+# Ignore all .lammps files
 *.lammps
+
+# Ignore all .lmp files except those in 01_input_files/examples/
 *.lmp
+!01_input_files/examples/*.lmp
 
 # Ignore any folders ending with _dump or _input
 *_dump/
