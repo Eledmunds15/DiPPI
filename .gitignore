@@ -25,6 +25,9 @@ venv/
 *_dump/
 *_input/
 
+# But un-ignore this one
+!01_input_files/
+
 # Ignore restart and dump folders if present
 dump_files/
 restart_files/
