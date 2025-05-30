@@ -16,4 +16,4 @@ source activate analysis
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 # Run python script
-mpirun -n $SLURM_NTASKS python analysis.py
+mpirun -np $SLURM_NTASKS python -m 03_dislo_pin.simulate
