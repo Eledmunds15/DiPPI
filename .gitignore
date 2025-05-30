@@ -5,3 +5,7 @@
 __pycache__*
 
 *_files/
+
+*.lammps
+
+02_minimization/min_dump/edge_dislo_dump/
