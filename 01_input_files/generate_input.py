@@ -22,14 +22,16 @@ X_ORIENTATION = '[111]'
 Y_ORITENTATION = '[-101]'
 Z_ORITENTATION = '[1-21]'
 
-X_SIZE = 20
-Y_SIZE = 20
-Z_SIZE = 20
+X_SIZE = 100
+Y_SIZE = 70
+Z_SIZE = 60
 
 # --------------------------- INPUT GENERATOR ---------------------------#
 def main():
 
     set_path()
+
+    clear_dir_exclude_file()
 
     #--- DEFINE DIRECTORIES ---#
 
