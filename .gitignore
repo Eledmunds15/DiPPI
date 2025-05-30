@@ -1,11 +1,41 @@
-# Data Files
-*.lmp
-*.xsf
+# Ignore Python bytecode
+__pycache__/
 
-__pycache__*
-
+# Ignore Jupyter Notebook checkpoints and output folders
+.ipynb_checkpoints/
 *_files/
 
-*.lammps
+# Ignore Conda and virtual environments
+.env/
+.venv/
+env/
+venv/
 
-02_minimization/min_dump/edge_dislo_dump/
+# Ignore VSCode settings folder
+.vscode/
+
+# Ignore LAMMPS data files
+*.lammps
+*.lmp
+
+# Ignore any folders ending with _dump or _input
+*_dump/
+*_input/
+
+# Ignore restart and dump folders if present
+dump_files/
+restart_files/
+
+# Ignore log and output files
+*.log
+*.log.lammps
+*.out
+*.dat
+*.tmp
+*.bak
+*.swp
+*~
+
+# Ignore OS system files
+.DS_Store
+Thumbs.db
