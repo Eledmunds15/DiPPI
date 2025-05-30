@@ -6,11 +6,16 @@ from mpi4py import MPI
 from ovito.io import import_file, export_file
 from ovito.modifiers import DeleteSelectedModifier, InvertSelectionModifier
 
+from utilities import set_path, clear_dir
+
 # --------------------------- CONFIG ---------------------------
-DUMP_DIR = 'dump_files'
-OUTPUT_DIR = 'dump_files_processed'
-PRECIPITATE_ID_FILE = 'precipitate_ID'
+INPUT_DIR = '../03_dislo_pin/dump_files'
+PRECIPITATE_ID_FILE = '../03_dislo_pin/precipitate_ID'
+
+OUTPUT_DIR = 'peratom_threshold_files'
+
 PERATOM_THRESHOLD = -4.0
+
 # -------------------------------------------------------------
 
 def main():
@@ -18,20 +23,17 @@ def main():
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+    set_path()
+
     if rank == 0:
-        print(f"Preparing output directory...")
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         clear_dir(OUTPUT_DIR)
-        print(f"Loading precipitate IDs...")
         precipitate_ids = load_precipitate_ids(PRECIPITATE_ID_FILE)
-        print(f"Loaded {len(precipitate_ids)} precipitate IDs.")
         
         dump_files = sorted([
-            f for f in os.listdir(DUMP_DIR)
-            if os.path.isfile(os.path.join(DUMP_DIR, f))
+            f for f in os.listdir(INPUT_DIR)
+            if os.path.isfile(os.path.join(INPUT_DIR, f))
         ])
-        print(f"Found {len(dump_files)} dump files to process.")
-        print(f"Using {size} ranks for parallel processing.\n")
     else:
         precipitate_ids = None
         dump_files = None
@@ -54,7 +56,7 @@ def main():
 # -------------------- Processing Functions --------------------
 
 def process_dump_file(dump_file, precipitate_ids):
-    input_path = os.path.join(DUMP_DIR, dump_file)
+    input_path = os.path.join(INPUT_DIR, dump_file)
     output_path = os.path.join(OUTPUT_DIR, dump_file)
 
     pipeline = import_file(input_path)
@@ -71,10 +73,9 @@ def process_dump_file(dump_file, precipitate_ids):
 
 # -------------------- Selection Function --------------------
 
-def select_atoms(frame, data, precipitate_IDs=None):
+def select_atoms(frame, data):
     
-    if precipitate_IDs is None:
-        precipitate_IDs = load_precipitate_ids(PRECIPITATE_ID_FILE)
+    precipitate_IDs = load_precipitate_ids(PRECIPITATE_ID_FILE)
     
     ids = data.particles_['Particle Identifier']
     peratom = data.particles_['c_peratom']
@@ -87,17 +88,6 @@ def select_atoms(frame, data, precipitate_IDs=None):
     data.particles.create_property('Selection', data=selection)
 
 # ------------------------ Utilities ---------------------------
-
-def clear_dir(path):
-    for filename in os.listdir(path):
-        file_path = os.path.join(path, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print(f"Failed to delete {file_path}: {e}")
 
 def load_precipitate_ids(filepath):
     with open(filepath, 'r') as f:
