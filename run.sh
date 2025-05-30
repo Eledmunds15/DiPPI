@@ -5,14 +5,14 @@
 #SBATCH --mem-per-cpu=1500MB
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks=256
-#SBATCH --output=output-%j.log
-#SBATCH --error=error-%j.log
+#SBATCH --output=999_HPC_outputs/output-%j.log
+#SBATCH --error=999_HPC_outputs/error-%j.log
 
 # Create or clear HPC_outputs directory
 if [ -d HPC_outputs ]; then
-    rm -rf HPC_outputs/*
+    rm -rf 999_HPC_outputs/*
 else
-    mkdir HPC_outputs
+    mkdir 999_HPC_outputs
 fi
 
 # Load python modules
