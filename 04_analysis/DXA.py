@@ -10,14 +10,17 @@ from utilities import set_path, clear_dir
 
 # --------------------------- CONFIG ---------------------------#
 
-INPUT_DIR = '../05_jog_stability/dump_files'
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
+
+MASTER_DATA_DIR = '000_output_files'
+MODULE_DIR = '04_analysis'
+
+INPUT_DIR = '03_dislo_pin/dump_files'
 INPUT_FILE = 'dumpfile_*'
 
 OUTPUT_LINES_DIR = 'DXA_lines_files'
 OUTPUT_ATOMS_DIR = 'DXA_atoms_files'
-
-
-AVERAGE_WINDOW = 5
 
 # --------------------------- ANALYSIS ---------------------------#
 
@@ -27,22 +30,35 @@ def main():
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    set_path()
+    set_path(PROJECT_ROOT)
 
     #--- INITIALISE VARIABLE ON ALL RANKS ---#
     dump_files = None
 
     #--- CREATE AND SET DIRECTORIES ---#
     if rank == 0:
-        os.makedirs(OUTPUT_LINES_DIR, exist_ok=True)
-        os.makedirs(OUTPUT_ATOMS_DIR, exist_ok=True)
-        clear_dir(OUTPUT_LINES_DIR)
-        clear_dir(OUTPUT_ATOMS_DIR)
+        os.makedirs(MASTER_DATA_DIR, exist_ok=True)
+        os.makedirs(os.path.join(MASTER_DATA_DIR, MODULE_DIR), exist_ok=True)
 
-        dump_files = get_filenames(INPUT_DIR)
+        input_dir = os.path.join(MASTER_DATA_DIR, INPUT_DIR)
+        output_lines_dir = os.path.join(MASTER_DATA_DIR, MODULE_DIR, OUTPUT_LINES_DIR)
+        output_atoms_dir = os.path.join(MASTER_DATA_DIR, MODULE_DIR, OUTPUT_ATOMS_DIR)
 
-        print(f"Found {len(dump_files)} dump files to process.")
-        print(f"Using {size} ranks for parallel processing.\n")
+        os.makedirs(output_lines_dir, exist_ok=True)
+        os.makedirs(output_atoms_dir, exist_ok=True)
+
+        clear_dir(output_lines_dir)
+        clear_dir(output_atoms_dir)
+
+        dump_files = get_filenames(input_dir)
+
+    else:
+        # For other ranks, initialize variables to None or empty strings
+        dump_dir = None
+        output_dir = None
+        input_filepath = None
+        restart_filepath = None
+        dump_filepath = None
 
     #--- BROADCAST AND DISTRIBUTE WORK ---#
     dump_files = comm.bcast(dump_files, root=0)
@@ -61,9 +77,9 @@ def main():
 
 def process_file(dump_chunk):
 
-    input_paths = [os.path.join(INPUT_DIR, dump_file) for dump_file in dump_chunk]
-    output_atoms_path = [os.path.join(OUTPUT_ATOMS_DIR, dump_file) for dump_file in dump_chunk]
-    output_lines_path = [os.path.join(OUTPUT_LINES_DIR, dump_file) for dump_file in dump_chunk]
+    input_paths = [os.path.join(MASTER_DATA_DIR, INPUT_DIR, dump_file) for dump_file in dump_chunk]
+    output_atoms_path = [os.path.join(MASTER_DATA_DIR, MODULE_DIR, OUTPUT_ATOMS_DIR, dump_file) for dump_file in dump_chunk]
+    output_lines_path = [os.path.join(MASTER_DATA_DIR, MODULE_DIR, OUTPUT_LINES_DIR, dump_file) for dump_file in dump_chunk]
 
     pipeline = import_file(input_paths)
 
