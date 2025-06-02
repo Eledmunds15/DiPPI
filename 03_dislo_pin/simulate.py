@@ -8,13 +8,19 @@ from utilities import set_path, clear_dir
 
 # --------------------------- CONFIG ---------------------------#
 
-INPUT_DIR = '../02_minimization/min_input'
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
+
+MASTER_DATA_DIR = '000_output_files'
+MODULE_DIR = '03_dislo_pin'
+
+INPUT_DIR = '02_minimization/min_input'
 INPUT_FILE = 'edge_dislo.lmp'
 
 DUMP_DIR = 'dump_files'
 RESTART_DIR = 'restart_files'
 
-POTENTIAL_DIR = '../00_potentials'
+POTENTIAL_DIR = '00_potentials'
 POTENTIAL_FILE = 'malerba.fs'
 
 PRECIPITATE_RADIUS = 30
@@ -39,30 +45,54 @@ def main():
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    set_path()
+    set_path(PROJECT_ROOT)
 
     if rank == 0:
-          os.makedirs(DUMP_DIR, exist_ok=True)
-          os.makedirs(RESTART_DIR, exist_ok=True)
-          clear_dir(DUMP_DIR)
-          clear_dir(RESTART_DIR)
+        os.makedirs(MASTER_DATA_DIR, exist_ok=True)
+        os.makedirs(os.path.join(MASTER_DATA_DIR, MODULE_DIR), exist_ok=True)
 
-    #--- CREATE AND SET DIRECTORIES ---#
+        dump_dir = os.path.join(MASTER_DATA_DIR, MODULE_DIR, DUMP_DIR)
+        output_dir = os.path.join(MASTER_DATA_DIR, MODULE_DIR, RESTART_DIR)
 
-    input_filepath = os.path.join(INPUT_DIR, INPUT_FILE)
+        os.makedirs(dump_dir, exist_ok=True)
+        os.makedirs(output_dir, exist_ok=True)
 
-    dump_file = 'dumpfile_*'
-    restart_file = 'restart.*'
+        clear_dir(dump_dir)
+        clear_dir(output_dir)
 
-    dump_filepath = os.path.join(DUMP_DIR, dump_file)
-    restart_filepath = os.path.join(RESTART_DIR, restart_file)
+        input_filepath = os.path.join(MASTER_DATA_DIR, INPUT_DIR, INPUT_FILE)
 
-    potential_path = os.path.join(POTENTIAL_DIR, POTENTIAL_FILE)
+        dump_file = 'dumpfile_*'
+        restart_file = 'restart.*'
+
+        restart_filepath = os.path.join(output_dir, restart_file)
+        dump_filepath = os.path.join(dump_dir, dump_file)
+
+        potential_path = os.path.join(POTENTIAL_DIR, POTENTIAL_FILE)
+
+    else:
+        # For other ranks, initialize variables to None or empty strings
+        dump_dir = None
+        output_dir = None
+        input_filepath = None
+        restart_filepath = None
+        dump_filepath = None
+        potential_path = None
+
+    # Now broadcast all variables from rank 0 to all ranks
+    dump_dir = comm.bcast(dump_dir, root=0)
+    output_dir = comm.bcast(output_dir, root=0)
+    input_filepath = comm.bcast(input_filepath, root=0)
+    restart_filepath = comm.bcast(restart_filepath, root=0)
+    dump_filepath = comm.bcast(dump_filepath, root=0)
+    potential_path = comm.bcast(potential_path, root=0)
 
     #--- LAMMPS Script ---#
     #--- Settings ---#
     lmp = lammps()
     L = PyLammps(ptr=lmp)
+
+    L.log(os.path.join(MASTER_DATA_DIR, MODULE_DIR, 'log.lammps'))
 
     L.units('metal')
     L.atom_style('atomic')
@@ -132,7 +162,7 @@ def main():
     L.velocity('precipitate', 'set', 0.0, 0.0, 0.0)
 
     #--- Dump ID's for post-processing ---#
-    L.write_dump('precipitate', 'custom', 'precipitate_ID', 'id')
+    L.write_dump('precipitate', 'custom', os.path.join(MASTER_DATA_DIR, MODULE_DIR, 'precipitate_ID'), 'id')
 
     #--- Thermo ---#
     L.thermo_style('custom', 'step', 'temp', 'pe', 'etotal', 'c_press_comp[1]', 'c_press_comp[2]', 'c_press_comp[3]', 'c_press_comp[4]', 'c_press_comp[5]', 'c_press_comp[6]')
