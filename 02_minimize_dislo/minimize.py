@@ -25,6 +25,7 @@ POTENTIAL_FILE = 'malerba.fs'
 
 ENERGY_TOL = 1e-6
 FORCE_TOL = 1e-8
+BUFF = 2 # Buffer layer in Ang
 
 # --------------------------- MINIMIZATION ---------------------------#
 
@@ -100,8 +101,32 @@ def main():
     L.compute('peratom', 'all', 'pe/atom') # Set a compute to track the peratom energy
 
     L.minimize(ENERGY_TOL, FORCE_TOL, 1000, 10000) # Execute minimization
-    
-    L.change_box('all', 'y', 'final', ylo, yhi)
+
+    """atom_pos = lmp.numpy.extract_atom('x')
+    y_pos = atom_pos[:, 1]
+
+    # Compute new bounds with buffer
+    ylo_local = np.min(y_pos)
+    yhi_local = np.max(y_pos)
+
+    print(f"Local ylo: {ylo_local}")
+    print(f"Local yhi: {yhi_local}")
+
+    # Reduce across all ranks to get global min/max
+    ylo_global = comm.allreduce(ylo_local, op=MPI.MIN)
+    yhi_global = comm.allreduce(yhi_local, op=MPI.MAX)
+
+    if rank == 0:
+
+        print(f"Global ylo: {ylo_global}")
+        print(f"Global yhi: {yhi_global}")
+
+    ylo_new = ylo_global - BUFF
+    yhi_new = yhi_global + BUFF
+
+    L.change_box('all', 'y', 'final', ylo_new, yhi_new, 'remap')
+
+    print("\nWriting outputs...")"""
 
     L.write_dump('all', 'custom', dump_filepath, 'id', 'x', 'y', 'z', 'c_peratom') # Write a dumpfile containing atom positions and pot energies
     L.write_data(output_filepath) # Write a lammps input file with minimized configuration for subsequent sims

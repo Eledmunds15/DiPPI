@@ -25,7 +25,7 @@ POTENTIAL_FILE = 'malerba.fs'
 
 PRECIPITATE_RADIUS = 30
 DISLOCATION_INITIAL_DISPLACEMENT = 10 # Distance from the precipitate in Angstroms
-FIXED_SURFACE_DEPTH = 10 # Depth of the fixed surface in Angstroms
+FIXED_SURFACE_DEPTH = 5 # Depth of the fixed surface in Angstroms
 
 DT = 0.001
 TEMPERATURE = 100
