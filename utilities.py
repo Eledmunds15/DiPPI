@@ -14,20 +14,21 @@ def set_path():
     # Uncomment below to debug the working directory being set
     # print(f"[DEBUG] Working directory set to: {script_dir}")
 
-def clear_dir_exclude_file(exclude_file=None):
-    current_script = os.path.basename(sys.argv[0])
-    print(current_script)
-    for filename in os.listdir('.'):
-        if filename == current_script:
+def clear_dir_exclude_files(target_dir, exclude_files=None):
+    exclude_files = set(os.path.abspath(f) for f in (exclude_files or []))
+    
+    for filename in os.listdir(target_dir):
+        filepath = os.path.abspath(os.path.join(target_dir, filename))
+        
+        if filepath in exclude_files:
             continue
-        if exclude_file and filename == exclude_file:
-            continue
-        if os.path.isfile(filename):
+        
+        if os.path.isfile(filepath):
             try:
-                os.remove(filename)
-                print(f"Deleted: {filename}")
+                os.remove(filepath)
+                print(f"Deleted: {filepath}")
             except Exception as e:
-                print(f"Could not delete {filename}: {e}")
+                print(f"Could not delete {filepath}: {e}")
 
 def clear_dir(dir_path):
      
