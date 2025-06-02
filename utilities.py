@@ -1,18 +1,22 @@
 import os
 import sys
 
-def set_path():
+def set_path(path=None):
     """
-    Set the current working directory to the directory of the running script.
+    Set the current working directory.
     
-    This is useful when you want to ensure that all relative file operations
-    happen with respect to the script's location, not the current shell directory.
+    - If `path` is provided, set the working directory to that path.
+    - If not, set it to the directory of the running script.
     """
-    script_path = os.path.abspath(sys.argv[0])
-    script_dir = os.path.dirname(script_path)
-    os.chdir(script_dir)
+    if path:
+        target_dir = os.path.abspath(path)
+    else:
+        script_path = os.path.abspath(sys.argv[0])
+        target_dir = os.path.dirname(script_path)
+    
+    os.chdir(target_dir)
     # Uncomment below to debug the working directory being set
-    # print(f"[DEBUG] Working directory set to: {script_dir}")
+    # print(f"[DEBUG] Working directory set to: {target_dir}")
 
 def clear_dir_exclude_files(target_dir, exclude_files=None):
     exclude_files = set(os.path.abspath(f) for f in (exclude_files or []))
