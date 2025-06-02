@@ -1,3 +1,5 @@
+000_output_files/
+
 # Ignore Python bytecode
 __pycache__/
 
