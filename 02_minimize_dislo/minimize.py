@@ -1,5 +1,6 @@
 # --------------------------- LIBRARIES ---------------------------#
 import os
+import numpy as np
 from mpi4py import MPI
 from lammps import lammps, PyLammps
 
@@ -11,11 +12,11 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
 
 MASTER_DATA_DIR = '000_output_files'
-MODULE_DIR = '02_minimization'
 
 INPUT_DIR = '01_input'
 INPUT_FILE = 'edge_dislo.lmp'
 
+MODULE_DIR = '02_minimize_dislo'
 DUMP_DIR = 'min_dump'
 OUTPUT_DIR = 'min_input'
 
@@ -34,6 +35,8 @@ def main():
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+    #--- CREATE AND SET DIRECTORIES ---#
+
     set_path(PROJECT_ROOT)
 
     if rank == 0:
@@ -51,8 +54,8 @@ def main():
 
         input_filepath = os.path.join(MASTER_DATA_DIR, INPUT_DIR, INPUT_FILE)
 
-        output_file = 'edge_dislo.lmp'
-        dump_file = 'edge_dislo_dump'
+        output_file = 'straight_edge_dislo.lmp'
+        dump_file = 'straight_edge_dislo_dump'
 
         output_filepath = os.path.join(output_dir, output_file)
         dump_filepath = os.path.join(dump_dir, dump_file)
@@ -85,7 +88,7 @@ def main():
     L.units('metal') # Set units style
     L.atom_style('atomic') # Set atom style
 
-    L.command('boundary f f p') # Set the boundaries of the simulation
+    L.command('boundary p f p') # Set the boundaries of the simulation
 
     L.read_data(input_filepath) # Read input file
 
@@ -97,6 +100,8 @@ def main():
     L.compute('peratom', 'all', 'pe/atom') # Set a compute to track the peratom energy
 
     L.minimize(ENERGY_TOL, FORCE_TOL, 1000, 10000) # Execute minimization
+    
+    L.change_box('all', 'y', 'final', ylo, yhi)
 
     L.write_dump('all', 'custom', dump_filepath, 'id', 'x', 'y', 'z', 'c_peratom') # Write a dumpfile containing atom positions and pot energies
     L.write_data(output_filepath) # Write a lammps input file with minimized configuration for subsequent sims
@@ -104,8 +109,6 @@ def main():
     L.close()
 
     return None
-
-# --------------------------- UTILITIES ---------------------------#
 
 # --------------------------- ENTRY POINT ---------------------------#
 
