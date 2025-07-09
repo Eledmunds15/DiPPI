@@ -1,16 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=Precipitate_Analysis
+#SBATCH --job-name=Precipitate_Simulation
 #SBATCH --mail-user=eledmunds1@sheffield.ac.uk
 #SBATCH --time=00:10:00
-#SBATCH --mem-per-cpu=1500MB
+#SBATCH --mem-per-cpu=1GB
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks=256
 #SBATCH --output=999_HPC_outputs/output-%j.log
 #SBATCH --error=999_HPC_outputs/error-%j.log
-
-# Create or clear HPC_outputs directory
-rm -rf 999_HPC_outputs/*
-
 
 # Load python modules
 export SLURM_EXPORT_ENV=ALL
